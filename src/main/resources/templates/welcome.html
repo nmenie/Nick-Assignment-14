@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Welcome</title>
+    <script th:inline="javascript">
+    /*<![CDATA[*/
+    (function() {
+        // JavaScript code goes here
+        window.onload = function() {
+            var name = prompt('What is your name?', 'Guest');
+            if (name) {
+                window.location.href = '/channels';
+            } else {
+                window.location.href = '/';
+            }
+        };
+    })();
+    /*]]>*/
+    </script>
+</head>
+<body>
+    <h1>Welcome</h1>
+</body>
+</html>
+
