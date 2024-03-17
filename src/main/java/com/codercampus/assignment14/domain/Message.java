@@ -3,73 +3,62 @@ package com.codercampus.assignment14.domain;
 import java.time.LocalDateTime;
 
 public class Message {
-    private String id;
-    private String userId;
-    private String channelId;
+	private Long channelId;
+    private Long id;
     private String content;
+    private String senderUsername;
     private LocalDateTime timestamp;
-	private String text;
 
-    public Message(String id, String userId, String channelId, String text) {
+    public Message() {
+        // Default constructor
+    }
+
+    public Message(Long id, String content, String senderUsername, LocalDateTime timestamp) {
         this.id = id;
-        this.userId = userId;
-        this.channelId = channelId;
-        this.text = text;
+        this.content = content;
+        this.senderUsername = senderUsername;
+        this.timestamp = timestamp;
     }
     
     
 
-	public String getText() {
-		return text;
-	}
-
-
-
-	public void setText(String text) {
-		this.text = text;
-	}
-
-
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getUserId() {
-		return userId;
-	}
-
-	public void setUserId(String userId) {
-		this.userId = userId;
-	}
-
-	public String getChannelId() {
+    public Long getChannelId() {
 		return channelId;
 	}
 
-	public void setChannelId(String channelId) {
+	public void setChannelId(Long channelId) {
 		this.channelId = channelId;
 	}
 
-	public String getContent() {
-		return content;
-	}
+	public Long getId() {
+        return id;
+    }
 
-	public void setContent(String content) {
-		this.content = content;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public LocalDateTime getTimestamp() {
-		return timestamp;
-	}
+    public String getContent() {
+        return content;
+    }
 
-	public void setTimestamp(LocalDateTime timestamp) {
-		this.timestamp = timestamp;
-	}
+    public void setContent(String content) {
+        this.content = content;
+    }
 
-    
+    public String getSenderUsername() {
+        return senderUsername;
+    }
+
+    public void setSenderUsername(String senderUsername) {
+        this.senderUsername = senderUsername;
+    }
+
+    public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(LocalDateTime timestamp) {
+        this.timestamp = timestamp;
+    }
 }

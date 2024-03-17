@@ -1,29 +1,31 @@
 package com.codercampus.assignment14.domain;
 
-
 public class User {
-    private String id;
-    private String name;
+    private Long userId;
+    private String username;
 
-    public User(String id, String name) {
-        this.id = id;
-        this.name = name;
+    public User(String username) {
+        // Default constructor
     }
 
-    public String getId() {
-        return id;
+    public User(Long userId, String username) {
+        this.userId = userId;
+        this.username = username;
     }
 
-
-	public void setId(String id) {
-        this.id = id;
+    public Long getUserId() {
+        return userId;
     }
 
-    public String getName() {
-        return name;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
-    public void setName(String name) {
-    	this.name = name;
+
+    public String getUsername() {
+        return username;
     }
-    
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 }
