@@ -3,7 +3,6 @@ package com.codercampus.assignment14.web;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Controller;
@@ -16,12 +15,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.codercampus.assignment14.domain.Channel;
 import com.codercampus.assignment14.domain.Message;
+import com.codercampus.assignment14.domain.User;
 import com.codercampus.assignment14.repository.ChannelRepository;
 import com.codercampus.assignment14.repository.MessageRepository;
 import com.codercampus.assignment14.repository.UserRepository;
 
 import jakarta.servlet.http.HttpSession;
-import java.util.Map;
 
 @Controller
 public class ChatController {
@@ -29,7 +28,6 @@ public class ChatController {
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
     private final MessageRepository messageRepository;
-    private Map<String, String> sessionUsernames = new ConcurrentHashMap<>();
 
     public ChatController(ChannelRepository channelRepository, UserRepository userRepository, MessageRepository messageRepository) {
         this.channelRepository = channelRepository;
@@ -38,11 +36,11 @@ public class ChatController {
     }
 
     @GetMapping("/welcome")
-    public String welcomePage(ModelMap model, @RequestParam(required = false) String userId) {
+    public String welcomePage(ModelMap model, @RequestParam(required = false) Long userId) {
         if (userId != null) {
-            String username = sessionUsernames.get(userId);
-            if (username != null) {
-                model.addAttribute("username", username);
+            User user = userRepository.findByUserId(userId);
+            if (user != null) {
+                model.addAttribute("username", user.getUsername());
             }
         }
         return "welcome";
@@ -50,10 +48,9 @@ public class ChatController {
 
     @PostMapping("/welcome")
     public String handleWelcome(@RequestParam String username, HttpSession session) {
-        String userId = session.getId();
-        sessionUsernames.put(userId, username);
-        session.setAttribute("userId", userId);
-        session.setAttribute("username", username);
+        User user = new User(username);
+        user = userRepository.save(user);
+        session.setAttribute("userId", user.getUserId());
         return "redirect:/channels";
     }
 
@@ -62,9 +59,11 @@ public class ChatController {
         List<Channel> channels = channelRepository.findChannels();
         model.addAttribute("channels", channels);
         
-        String userId = (String) session.getAttribute("userId");
-        String username = sessionUsernames.get(userId);
-        model.addAttribute("username", username);
+        Long userId = (Long) session.getAttribute("userId");
+        User user = userRepository.findByUserId(userId);
+        if (user != null) {
+            model.addAttribute("username", user.getUsername());
+        }
         
         return "channels";
     }
@@ -83,9 +82,11 @@ public class ChatController {
         if (channel != null) {
             model.addAttribute("channel", channel);
             
-            String userId = (String) session.getAttribute("userId");
-            String username = sessionUsernames.get(userId);
-            model.addAttribute("username", username);
+            Long userId = (Long) session.getAttribute("userId");
+            User user = userRepository.findByUserId(userId);
+            if (user != null) {
+                model.addAttribute("username", user.getUsername());
+            }
             
             return "channel";
         } else {
@@ -95,10 +96,10 @@ public class ChatController {
 
     @GetMapping("/channels/{channelId}/messages")
     public List<Message> getNewMessages(@PathVariable Long channelId, @RequestParam(defaultValue = "0") Long lastMessageId, HttpSession session) {
-        String userId = (String) session.getAttribute("userId");
-        String username = sessionUsernames.get(userId);
+        Long userId = (Long) session.getAttribute("userId");
+        User user = userRepository.findByUserId(userId);
         Channel channel = channelRepository.findById(channelId);
-        if (channel != null && username != null) {
+        if (channel != null && user != null) {
             return channel.getMessages().stream()
                     .filter(message -> message.getId() > lastMessageId)
                     .collect(Collectors.toList());
@@ -108,13 +109,13 @@ public class ChatController {
 
     @PostMapping("/channels/{channelId}/messages")
     public String sendMessage(@PathVariable Long channelId, @RequestParam String content, HttpSession session) {
-        String userId = (String) session.getAttribute("userId");
-        String username = sessionUsernames.get(userId);
+        Long userId = (Long) session.getAttribute("userId");
+        User user = userRepository.findByUserId(userId);
         Channel channel = channelRepository.findById(channelId);
-        if (channel != null && username != null) {
+        if (channel != null && user != null) {
             Message message = new Message();
             message.setContent(content);
-            message.setSenderUsername(username);
+            message.setSenderUsername(user.getUsername());
             message.setTimestamp(LocalDateTime.now());
             message = messageRepository.save(message);
             channel.getMessages().add(message);
