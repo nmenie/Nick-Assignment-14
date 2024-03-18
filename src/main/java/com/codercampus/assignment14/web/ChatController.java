@@ -51,6 +51,7 @@ public class ChatController {
         User user = new User(username);
         user = userRepository.save(user);
         session.setAttribute("userId", user.getUserId());
+        session.setAttribute("username", username);
         return "redirect:/channels";
     }
 
@@ -59,10 +60,9 @@ public class ChatController {
         List<Channel> channels = channelRepository.findChannels();
         model.addAttribute("channels", channels);
         
-        Long userId = (Long) session.getAttribute("userId");
-        User user = userRepository.findByUserId(userId);
-        if (user != null) {
-            model.addAttribute("username", user.getUsername());
+        String username = (String) session.getAttribute("username");
+        if (username != null) {
+            model.addAttribute("username", username);
         }
         
         return "channels";
