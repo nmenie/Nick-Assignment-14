@@ -41,6 +41,7 @@ public class ChatController {
             User user = userRepository.findByUserId(userId);
             if (user != null) {
                 model.addAttribute("username", user.getUsername());
+                model.addAttribute("userId", user.getUserId());
             }
         }
         return "welcome";
@@ -60,8 +61,10 @@ public class ChatController {
         List<Channel> channels = channelRepository.findChannels();
         model.addAttribute("channels", channels);
         
+        Long userId = (Long) session.getAttribute("userId");
         String username = (String) session.getAttribute("username");
-        if (username != null) {
+        if (userId != null && username != null) {
+            model.addAttribute("userId", userId);
             model.addAttribute("username", username);
         }
         
@@ -83,9 +86,10 @@ public class ChatController {
             model.addAttribute("channel", channel);
             
             Long userId = (Long) session.getAttribute("userId");
-            User user = userRepository.findByUserId(userId);
-            if (user != null) {
-                model.addAttribute("username", user.getUsername());
+            String username = (String) session.getAttribute("username");
+            if (userId != null && username != null) {
+                model.addAttribute("userId", userId);
+                model.addAttribute("username", username);
             }
             
             return "channel";
@@ -96,12 +100,12 @@ public class ChatController {
 
     @GetMapping("/channels/{channelId}/messages")
     public List<Message> getNewMessages(@PathVariable Long channelId, @RequestParam(defaultValue = "0") Long lastMessageId, HttpSession session) {
-        Long userId = (Long) session.getAttribute("userId");
-        User user = userRepository.findByUserId(userId);
+        String username = (String) session.getAttribute("username");
         Channel channel = channelRepository.findById(channelId);
-        if (channel != null && user != null) {
+        if (channel != null && username != null) {
             return channel.getMessages().stream()
                     .filter(message -> message.getId() > lastMessageId)
+                    .filter(message -> !message.getSenderUsername().equals(username))
                     .collect(Collectors.toList());
         }
         return Collections.emptyList();

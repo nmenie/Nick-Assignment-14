@@ -6,12 +6,15 @@
     <script type="module" src="chat.js"></script>
 </head>
 <body>
-    <input type="text" id="messageInput" placeholder="Type your message...">
+    <div id="messageContainer">
+        <!-- Messages will be dynamically added here -->
+    </div>
+    <form>
 
-    <!-- Replace with the appropriate server-side rendering syntax -->
-    <script>
-        var channelId = "{{ channelId }}";
-        
-    </script>
+        <input type="text" id="messageInput" placeholder="Type your message...">
+        <button type="submit" id="submit-btn">Send a message</button>
+    </form>
+
+  
 </body>
 </html>

@@ -2,18 +2,13 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Chat Channels</title>
-    <script>
-        function getChannel(channelId) {
-            sessionStorage.setItem("channelId", channelId);
-        }
-    </script>
 </head>
 <body>
     <h1>Welcome, <span th:text="${username}"></span>!</h1>
     <h3>Join A Channel</h3>
     <ul>
         <li th:each="channel : ${channels}">
-            <a th:href="@{/channels/{id}(id=${channel.id})}" th:text="${channel.channelName}" th:onclick="'getChannel(' + ${channel.id} + ')'"></a>
+            <a th:href="@{/channels/{id}(id=${channel.id})}" th:text="${channel.channelName}"></a>
         </li>
     </ul>
 </body>
