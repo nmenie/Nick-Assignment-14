@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+
   function getName() {
     const storedUsername = sessionStorage.getItem("username");
     if (!storedUsername) {
@@ -11,6 +11,9 @@ document.addEventListener('DOMContentLoaded', function() {
       redirectToChannels();
     }
   }
+  
+  getName();
+
 
   function submitUsername(username) {
     const xhr = new XMLHttpRequest();
@@ -28,12 +31,13 @@ document.addEventListener('DOMContentLoaded', function() {
     xhr.send('username=' + encodeURIComponent(username));
   }
 
+  submitUsername(username)
+
   function redirectToChannels() {
     window.location.replace('/channels');
   }
 
-  getName();
-});
+
   
   
 

@@ -2,32 +2,30 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Channel - [[${channel.channelName}]]</title>
-    <script th:src="@{/js/chat.js}"></script>
+    <script th:src="@{/js/channel.js}"></script>
+    <style>
+        .chat-window {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
     <h1>[[${channel.channelName}]] Channel</h1>
-
     <div id="messageContainer">
         <ul>
             <li th:each="message : ${channel.messages}">
-                <strong th:text="${message.senderUsername}"></strong>: [[${message.content}]]
+                <strong th:text="${username}"></strong>: [[${message.content}]]
             </li>
         </ul>
     </div>
-
-    <div id="chat-window"></div>
-
+    <div id="chatWindows"></div>
     <form th:action="@{/channels/{channelId}/messages(channelId=${channel.id})}" method="post">
-        <input type="text" name="content" placeholder="Type your message...">
-        <button type="submit">Send</button>
+        <input type="text" id="messageInput" name="content" placeholder="Type your message...">
+        <button type="submit" id="submit-btn">Send</button>
     </form>
-
-    <script th:inline="javascript">
-        // Get the channel object from the server-side model
-        var channel = /*[[${channel}]]*/ null;
-
-        // Start polling for new messages
-        startPolling(channel);
-    </script>
+   
+    
 </body>
 </html>

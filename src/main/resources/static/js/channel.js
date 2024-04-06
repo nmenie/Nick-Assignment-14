@@ -1,30 +1,64 @@
-document.addEventListener('DOMContentLoaded', function() {
-    var channelId = null;
-    var lastMessageId = 0;
+const messageInput = document.getElementById('messageInput');
 
-    function pollMessages() {
-        fetch('/channels/' + channelId + '/messages?lastMessageId=' + lastMessageId)
-            .then(response => response.json())
-            .then(data => {
-                data.forEach(message => {
-                    var chatWindow = document.getElementById('chat-window');
-                    var messageElement = document.createElement('div');
-                    messageElement.textContent = message.senderUsername + ': ' + message.content;
-                    chatWindow.appendChild(messageElement);
-                    lastMessageId = Math.max(lastMessageId, message.id);
-                });
-            })
-            .catch(error => {
-                console.error('Error:', error);
+
+
+
+
+let channelId = null;
+let lastMessageId = 0;
+let username = null;
+
+async function sendMessage(event) {
+    event.preventDefault();
+    const messageInput = document.getElementById('messageInput');
+    const message = messageInput.value.trim();
+    if (message !== '') {
+        try {
+            const response = await fetch(`/channels/${channelId}/messages`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ content: message }),
             });
+            if (response.ok) {
+                messageInput.value = '';
+                await pollMessages();
+            } else {
+                console.error('Error sending message:', response.status);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
     }
+}
 
-    function startPolling(channel) {
-        channelId = channel.id;
-        // Start polling for new messages every 500 milliseconds
-        setInterval(pollMessages, 500);
+async function pollMessages() {
+    try {
+        const response = await fetch(`/channels/${channelId}`);
+        if (response.ok) {
+            const data = await response.json();
+            const newMessages = data.messages.filter(message => message.id > lastMessageId);
+            const messageContainer = document.getElementById('messageContainer');
+            newMessages.forEach(message => {
+                const messageElement = document.createElement('div');
+                messageElement.innerHTML = `<strong>${username}</strong>: ${message.content}`;
+                messageContainer.appendChild(messageElement);
+                lastMessageId = Math.max(lastMessageId, message.id);
+            });
+        } else {
+            console.error('Error fetching messages:', response.status);
+        }
+    } catch (error) {
+        console.error('Error:', error);
     }
+}
 
-    // Export the startPolling function
-    window.startPolling = startPolling;
-});
+function startPolling(channel, currentUsername) {
+    channelId = channel.id;
+    username = currentUsername;
+    lastMessageId = channel.messages.reduce((maxId, message) => Math.max(maxId, message.id), 0);
+    setInterval(pollMessages, 5000);
+}
+
+window.startPolling = startPolling;

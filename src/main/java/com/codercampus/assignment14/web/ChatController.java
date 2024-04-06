@@ -67,6 +67,7 @@ public class ChatController {
             model.addAttribute("userId", userId);
             model.addAttribute("username", username);
         }
+     
         
         return "channels";
     }
@@ -83,32 +84,24 @@ public class ChatController {
     public String channelPage(@PathVariable Long channelId, ModelMap model, HttpSession session) {
         Channel channel = channelRepository.findById(channelId);
         if (channel != null) {
+            // Eagerly load the User object for each message and set the senderUsername
+            for (Message message : channel.getMessages()) {
+                User sender = userRepository.findByUserId(message.getId());
+                if (sender != null) {
+                    message.setSenderUsername(sender.getUsername());
+                }
+            }
             model.addAttribute("channel", channel);
-            
             Long userId = (Long) session.getAttribute("userId");
             String username = (String) session.getAttribute("username");
             if (userId != null && username != null) {
                 model.addAttribute("userId", userId);
                 model.addAttribute("username", username);
             }
-            
             return "channel";
         } else {
             return "redirect:/channels";
         }
-    }
-
-    @GetMapping("/channels/{channelId}/messages")
-    public List<Message> getNewMessages(@PathVariable Long channelId, @RequestParam(defaultValue = "0") Long lastMessageId, HttpSession session) {
-        String username = (String) session.getAttribute("username");
-        Channel channel = channelRepository.findById(channelId);
-        if (channel != null && username != null) {
-            return channel.getMessages().stream()
-                    .filter(message -> message.getId() > lastMessageId)
-                    .filter(message -> !message.getSenderUsername().equals(username))
-                    .collect(Collectors.toList());
-        }
-        return Collections.emptyList();
     }
 
     @PostMapping("/channels/{channelId}/messages")
