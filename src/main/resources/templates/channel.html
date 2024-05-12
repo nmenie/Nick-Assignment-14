@@ -1,31 +1,25 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Channel - [[${channel.channelName}]]</title>
-    <script th:src="@{/js/channel.js}"></script>
-    <style>
-        .chat-window {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin-bottom: 10px;
-        }
-    </style>
+    <title>Channel - <span th:text="${channel.name}"></span></title>
+    <script src="/js/channel.js" defer></script>
 </head>
 <body>
-    <h1>[[${channel.channelName}]] Channel</h1>
+    <h1>Channel: <span th:text="${channel.name}"></span></h1>
     <div id="messageContainer">
         <ul>
-            <li th:each="message : ${channel.messages}">
-                <strong th:text="${username}"></strong>: [[${message.content}]]
+            <li th:each="message : ${messages}">
+                <strong th:text="${message.user.username}"></strong>: <span th:text="${message.content}"></span>
             </li>
         </ul>
     </div>
-    <div id="chatWindows"></div>
-    <form th:action="@{/channels/{channelId}/messages(channelId=${channel.id})}" method="post">
-        <input type="text" id="messageInput" name="content" placeholder="Type your message...">
-        <button type="submit" id="submit-btn">Send</button>
+    <form id="messageForm">
+        <input type="text" id="messageInput" placeholder="Type your message..." required>
+        <button type="submit">Send</button>
     </form>
-   
-    
+    <script th:inline="javascript">
+        const channelId = /*[[${channel.id}]]*/ null;
+        const username = /*[[${username}]]*/ null;
+    </script>
 </body>
 </html>

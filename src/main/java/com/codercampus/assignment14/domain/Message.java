@@ -2,63 +2,60 @@ package com.codercampus.assignment14.domain;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+
+@Entity
 public class Message {
-	private Long channelId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String content;
-    private String senderUsername;
+    @ManyToOne
+    private User user;
+    @ManyToOne
+    private Channel channel;
     private LocalDateTime timestamp;
-
-    public Message() {
-        // Default constructor
-    }
-
-    public Message(Long id, String content, String senderUsername, LocalDateTime timestamp) {
-        this.id = id;
-        this.content = content;
-        this.senderUsername = senderUsername;
-        this.timestamp = timestamp;
-    }
-    
-    
-
-    public Long getChannelId() {
-		return channelId;
+	
+    public Message(String content2, User user2, Channel channel2, LocalDateTime now) {
+		// TODO Auto-generated constructor stub
 	}
-
-	public void setChannelId(Long channelId) {
-		this.channelId = channelId;
+	public Message() {
+		// TODO Auto-generated constructor stub
 	}
-
 	public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public String getSenderUsername() {
-        return senderUsername;
-    }
-
-    public void setSenderUsername(String senderUsername) {
-        this.senderUsername = senderUsername;
-    }
-
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
-    }
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
+	}
+	public String getContent() {
+		return content;
+	}
+	public void setContent(String content) {
+		this.content = content;
+	}
+	public User getUser() {
+		return user;
+	}
+	public void setUser(User user) {
+		this.user = user;
+	}
+	public Channel getChannel() {
+		return channel;
+	}
+	public void setChannel(Channel channel) {
+		this.channel = channel;
+	}
+	public LocalDateTime getTimestamp() {
+		return timestamp;
+	}
+	public void setTimestamp(LocalDateTime timestamp) {
+		this.timestamp = timestamp;
+	}
+    
+    
 }

@@ -1,16 +1,21 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Chat Channels</title>
+  <title>Chat Channels</title>
 </head>
 <body>
-    <h1>Welcome, <span th:text="${username}"></span>!</h1>
-    <h3>Join A Channel</h3>
-    <ul>
-        <li th:each="channel : ${channels}">
-            <a th:href="@{/channels/{id}(id=${channel.id})}" th:text="${channel.channelName}"></a>
-        </li>
-    </ul>
+  <h1>Welcome, <span th:text="${username}"></span>!</h1>
+  <h3>Join A Channel</h3>
+  <ul>
+    <li th:each="channel : ${channels}">
+      <a th:href="@{/channels/{id}(id=${channel.id})}" th:text="${channel.name}"></a>
+    </li>
+  </ul>
+  <form action="/channels/1/messages" method="post">
+    <input type="text" name="content" placeholder="Message content">
+    <input type="text" name="username" placeholder="Username">
+    <button type="submit">Send Message</button>
+</form>
 </body>
 </html>
         

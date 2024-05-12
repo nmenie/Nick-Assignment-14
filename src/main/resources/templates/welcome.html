@@ -1,10 +1,13 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html>
 <head>
     <title>Welcome</title>
-    <script th:src="@{/js/Welcome.js}"></script>
+    <script src="/js/Welcome.js" defer></script>
 </head>
 <body>
+    <form id="usernameForm" action="/channels" method="GET">
+        <input type="hidden" id="usernameInput" name="username">
+      </form>
 </body>
 </html>
 

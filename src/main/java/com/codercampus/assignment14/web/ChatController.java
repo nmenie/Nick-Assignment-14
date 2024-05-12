@@ -1,134 +1,118 @@
 package com.codercampus.assignment14.web;
 
-import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codercampus.assignment14.domain.Channel;
 import com.codercampus.assignment14.domain.Message;
 import com.codercampus.assignment14.domain.User;
-import com.codercampus.assignment14.repository.ChannelRepository;
 import com.codercampus.assignment14.repository.MessageRepository;
-import com.codercampus.assignment14.repository.UserRepository;
-
-import jakarta.servlet.http.HttpSession;
+import com.codercampus.assignment14.service.ChannelService;
+import com.codercampus.assignment14.service.MessageService;
+import com.codercampus.assignment14.service.UserService;
 
 @Controller
 public class ChatController {
-
-    private final ChannelRepository channelRepository;
-    private final UserRepository userRepository;
-    private final MessageRepository messageRepository;
-
-    public ChatController(ChannelRepository channelRepository, UserRepository userRepository, MessageRepository messageRepository) {
-        this.channelRepository = channelRepository;
-        this.userRepository = userRepository;
-        this.messageRepository = messageRepository;
-    }
+   
+	@Autowired
+	private UserService userService;
+	@Autowired
+	private ChannelService channelService;
+	@Autowired
+	private MessageService messageService;
+	
+	@Autowired
+	private MessageRepository messageRepository;
+	
+	
 
     @GetMapping("/welcome")
-    public String welcomePage(ModelMap model, @RequestParam(required = false) Long userId) {
-        if (userId != null) {
-            User user = userRepository.findByUserId(userId);
-            if (user != null) {
-                model.addAttribute("username", user.getUsername());
-                model.addAttribute("userId", user.getUserId());
-            }
-        }
+    public String welcomePage(ModelMap model) {
+    	
+    	 model.put("user", new User());
+    	
         return "welcome";
     }
 
     @PostMapping("/welcome")
-    public String handleWelcome(@RequestParam String username, HttpSession session) {
-        User user = new User(username);
-        user = userRepository.save(user);
-        session.setAttribute("userId", user.getUserId());
-        session.setAttribute("username", username);
-        return "redirect:/channels";
+    public String createUser(User user) {
+    
+        userService.saveUser(user);
+        return "redirect:/channel";
     }
-
+    
+    
+    
+    
     @GetMapping("/channels")
-    public String channelsPage(ModelMap model, HttpSession session) {
-        List<Channel> channels = channelRepository.findChannels();
-        model.addAttribute("channels", channels);
-        
-        Long userId = (Long) session.getAttribute("userId");
-        String username = (String) session.getAttribute("username");
-        if (userId != null && username != null) {
-            model.addAttribute("userId", userId);
-            model.addAttribute("username", username);
-        }
-     
-        
-        return "channels";
+    public String getChannels( ModelMap model, @RequestParam("username") String username) {
+    	
+    	Channel newChannel = new Channel();
+    	newChannel.setName("General Channel");
+    	model.put("username", username);
+    	model.put("channels", List.of(newChannel));
+    	return "channels";
     }
-
-    @PostMapping("/channels/create")
-    public String createChannel(@RequestParam String channelName) {
-        Channel channel = new Channel();
-        channel.setChannelName(channelName);
-        channelRepository.save(channel);
-        return "redirect:/channels";
+    
+   
+    
+    @GetMapping("/channel")
+    public String channel(ModelMap model, @PathVariable Long userId) {
+        User user = userService.findById(userId);
+        System.out.println(user.getUsername());
+        Channel generalChannel = channelService.GeneralChannel();
+      
+        model.put("user", user);
+        model.put("generalChannel", generalChannel);
+        
+        
+        return "channel";
     }
-
+    
     @GetMapping("/channels/{channelId}")
-    public String channelPage(@PathVariable Long channelId, ModelMap model, HttpSession session) {
-        Channel channel = channelRepository.findById(channelId);
-        if (channel != null) {
-            // Eagerly load the User object for each message and set the senderUsername
-            for (Message message : channel.getMessages()) {
-                User sender = userRepository.findByUserId(message.getId());
-                if (sender != null) {
-                    message.setSenderUsername(sender.getUsername());
-                }
-            }
-            model.addAttribute("channel", channel);
-            Long userId = (Long) session.getAttribute("userId");
-            String username = (String) session.getAttribute("username");
-            if (userId != null && username != null) {
-                model.addAttribute("userId", userId);
-                model.addAttribute("username", username);
-            }
-            return "channel";
-        } else {
-            return "redirect:/channels";
-        }
+    public String getGeneralChannel(@PathVariable Long channelId, ModelMap model) {
+        
+        Optional<Channel> channel = channelService.findById(channelId);
+        
+        model.put("channel", channel);
+        
+        return "general-channel";
     }
-
-    @PostMapping("/channels/{channelId}/messages")
-    public String sendMessage(@PathVariable Long channelId, @RequestParam String content, HttpSession session) {
-        Long userId = (Long) session.getAttribute("userId");
-        User user = userRepository.findByUserId(userId);
-        Channel channel = channelRepository.findById(channelId);
-        if (channel != null && user != null) {
-            Message message = new Message();
-            message.setContent(content);
-            message.setSenderUsername(user.getUsername());
-            message.setTimestamp(LocalDateTime.now());
-            message = messageRepository.save(message);
-            channel.getMessages().add(message);
-            channelRepository.save(channel);
-        }
-        return "redirect:/channels/" + channelId;
+//    
+//    @PostMapping("/channels/{channelId}/messages")
+//    public Message getMessages(
+//            @PathVariable Long channelId,
+//            @RequestParam("content") String content,
+//            @RequestParam("username") String username) {
+//        Channel channel = channelService.GeneralChannel();
+//        Message message = new Message();
+//        message.setChannel(channel);
+//        message.setContent(content);
+//        message.setUser(username);
+//        message.setTimestamp(new LocalDateTime(null, null));
+//        Message savedMessage = messageService.saveMessage(message);
+//        return savedMessage;
+//    }
+//    
+    
+    @GetMapping("/channels/{channelId/messages}")
+    public List<Message> getAllMessages(@PathVariable int channelId) {
+    	return channelService.findAll();
     }
-
-    @ModelAttribute("generalChannel")
-    public Channel getGeneralChannel() {
-        Channel generalChannel = channelRepository.findChannelByName("General");
-        if (generalChannel == null) {
-            generalChannel = new Channel();
-            generalChannel.setChannelName("General");
-            channelRepository.save(generalChannel);
-        }
-        return generalChannel;
-    }
+        
+    
+   
 }
+
