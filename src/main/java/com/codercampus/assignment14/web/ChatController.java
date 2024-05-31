@@ -50,7 +50,7 @@ public class ChatController {
     public String createUser(User user) {
     
         userService.saveUser(user);
-        return "redirect:/channel";
+        return "redirect:/channelS";
     }
     
     
@@ -68,51 +68,38 @@ public class ChatController {
     
    
     
-    @GetMapping("/channel")
-    public String channel(ModelMap model, @PathVariable Long userId) {
-        User user = userService.findById(userId);
-        System.out.println(user.getUsername());
-        Channel generalChannel = channelService.GeneralChannel();
-      
-        model.put("user", user);
-        model.put("generalChannel", generalChannel);
-        
-        
-        return "channel";
-    }
+//    @GetMapping("/channels")
+//    public String channel(ModelMap model, @PathVariable Long userId) {
+//        User user = userService.findById(userId);
+//        System.out.println(user.getUsername());
+//        Channel generalChannel = channelService.GeneralChannel();
+//      
+//        model.put("user", user);
+//        model.put("generalChannel", generalChannel);
+//        
+//        
+//        return "channels";
+//    }
     
     @GetMapping("/channels/{channelId}")
     public String getGeneralChannel(@PathVariable Long channelId, ModelMap model) {
-        
         Optional<Channel> channel = channelService.findById(channelId);
-        
-        model.put("channel", channel);
-        
-        return "general-channel";
+        if (channel.isPresent()) {
+            model.put("channel", channel.get());
+        } else {
+            model.put("error", "Channel not found");
+        }
+        return "channel"; // Ensure "general-channel.html" exists in templates
     }
-//    
-//    @PostMapping("/channels/{channelId}/messages")
-//    public Message getMessages(
-//            @PathVariable Long channelId,
-//            @RequestParam("content") String content,
-//            @RequestParam("username") String username) {
-//        Channel channel = channelService.GeneralChannel();
-//        Message message = new Message();
-//        message.setChannel(channel);
-//        message.setContent(content);
-//        message.setUser(username);
-//        message.setTimestamp(new LocalDateTime(null, null));
-//        Message savedMessage = messageService.saveMessage(message);
-//        return savedMessage;
-//    }
-//    
     
-    @GetMapping("/channels/{channelId/messages}")
-    public List<Message> getAllMessages(@PathVariable int channelId) {
-    	return channelService.findAll();
+    @GetMapping("/channels/{channelId}/messages")
+    @ResponseBody
+    public List<Message> getAllMessages(@PathVariable Long channelId) {
+        return messageService.getMessagesByChannel(channelId);
     }
+}
         
     
    
-}
+
 

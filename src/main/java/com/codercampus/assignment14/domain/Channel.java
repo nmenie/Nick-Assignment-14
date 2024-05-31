@@ -2,8 +2,7 @@ package com.codercampus.assignment14.domain;
 
 import java.util.List;
 
-import org.thymeleaf.expression.Messages;
-
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -17,8 +16,9 @@ public class Channel {
     private Long id;
     private String name;
     
-    @OneToMany
-    private List<Messages> messages;
+    @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL)
+    private List<Message> messages;
+    
 	public Long getId() {
 		return id;
 	}

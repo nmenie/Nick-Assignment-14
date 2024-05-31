@@ -11,11 +11,15 @@ import com.codercampus.assignment14.domain.Message;
 @Repository
 public interface MessageRepository extends JpaRepository<Message, Long> {
     
-	List<Message> findByChannelId(Channel channel);
+	
 
 	List<Message> findByChannel(Channel channel);
 
 	
+
+	
+
+	List<Message> findByChannelId(Long channelId);
 }
 
 

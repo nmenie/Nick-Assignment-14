@@ -22,7 +22,7 @@ public class MessageService {
         return messageRepository.save(message);
     }
 
-    public List<Message> getMessagesByChannel(Channel channel) {
-        return messageRepository.findByChannel(channel);
+    public List<Message> getMessagesByChannel(Long channelId) {
+        return messageRepository.findByChannelId(channelId);
     }
 }

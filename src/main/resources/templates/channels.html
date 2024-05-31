@@ -11,11 +11,7 @@
       <a th:href="@{/channels/{id}(id=${channel.id})}" th:text="${channel.name}"></a>
     </li>
   </ul>
-  <form action="/channels/1/messages" method="post">
-    <input type="text" name="content" placeholder="Message content">
-    <input type="text" name="username" placeholder="Username">
-    <button type="submit">Send Message</button>
-</form>
+
 </body>
 </html>
         

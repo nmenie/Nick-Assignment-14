@@ -1,25 +1,30 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Channel - <span th:text="${channel.name}"></span></title>
+    <title>General Channel</title>
     <script src="/js/channel.js" defer></script>
 </head>
 <body>
-    <h1>Channel: <span th:text="${channel.name}"></span></h1>
-    <div id="messageContainer">
-        <ul>
-            <li th:each="message : ${messages}">
-                <strong th:text="${message.user.username}"></strong>: <span th:text="${message.content}"></span>
-            </li>
-        </ul>
+    <h1>General Channel</h1>
+
+    <div th:if="${error}">
+        <p th:text="${error}" style="color: red;"></p>
     </div>
-    <form id="messageForm">
-        <input type="text" id="messageInput" placeholder="Type your message..." required>
-        <button type="submit">Send</button>
-    </form>
-    <script th:inline="javascript">
-        const channelId = /*[[${channel.id}]]*/ null;
-        const username = /*[[${username}]]*/ null;
-    </script>
+
+    <div th:if="${channel}">
+        <h2 th:text="${channel.name}"></h2>
+
+        <div id="messages-container">
+            <!-- Messages will be dynamically added here -->
+        </div>
+
+        <form id="message-form" th:action="@{/channels/{channelId}/messages(channelId=${channel.id})}" method="post">
+            <input type="text" name="content" placeholder="Message content" required>
+            <input type="text" name="username" placeholder="Username" required>
+            <button type="submit">Send Message</button>
+        </form>
+    </div>
+
+   
 </body>
 </html>
